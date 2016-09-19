@@ -21,6 +21,7 @@ import org.plukh.options.Options;
 
 public interface UnsupportedClassTestOptions extends Options {
     @Option
-    Float getFloat();
-    void setFloat(Float value);
+    MyInt getMyInt();
+    void setMyInt(MyInt value);
 }
+

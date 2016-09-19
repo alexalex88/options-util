@@ -176,8 +176,8 @@ public class OptionsFactory {
                 if (setter != null) throw new OptionsException("Read-only getter " + getter +
                         " has a matching setter in " + getter.getDeclaringClass().getName());
             } else {
-                if (setter == null) throw new OptionsException("No suitable setter for getter " + getter +
-                        " found in " + getter.getDeclaringClass().getName());
+//                if (setter == null) throw new OptionsException("No suitable setter for getter " + getter +
+//                        " found in " + getter.getDeclaringClass().getName());
                 gettersToSetters.put(getter, setter);
             }
         }
@@ -226,7 +226,8 @@ public class OptionsFactory {
                 keys.add(option.getKey());
                 gettersWithOptions.put(getter, option);
                 //Setter can be missing if option is read-only
-                if (setters.containsKey(getter)) settersWithOptions.put(setters.get(getter), option);
+                if (setters.containsKey(getter) && setters.get(getter) != null) settersWithOptions.put(setters.get(getter), option);
+                else option.setReadOnly(true);
             }
         } catch (UnsupportedOptionClassException e) {
             throw new OptionsException(e.getMessage(), e);

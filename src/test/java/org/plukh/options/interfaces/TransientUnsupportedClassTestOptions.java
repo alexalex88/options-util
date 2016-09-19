@@ -21,8 +21,14 @@ import org.plukh.options.Options;
 
 import java.io.File;
 
+//public interface TransientUnsupportedClassTestOptions extends Options {
+//    @Option(transientOption = true)
+//    File getFile();
+//    void setFile(File file);
+//}
+
 public interface TransientUnsupportedClassTestOptions extends Options {
     @Option(transientOption = true)
-    File getFile();
-    void setFile(File file);
+    MyInt getMyInt();
+    void setMyInt(MyInt myInt);
 }

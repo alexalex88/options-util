@@ -291,6 +291,7 @@ public abstract class AbstractOption {
             Constructor<?> ctor = clazz.getConstructor(String.class);
             Method m = clazz.getMethod("toString");
             if (m.getParameterCount() != 0) return false;
+            if (!m.getReturnType().equals(String.class)) return false;
         }
         catch (NoSuchMethodException e) {
             return false;

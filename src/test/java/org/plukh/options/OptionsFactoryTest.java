@@ -73,16 +73,33 @@ public class OptionsFactoryTest {
         }
     }
 
+//    @Test
+//    public void unsupportedOptionClassShouldThrowAnException() throws InstantiationException {
+//        testOptionsInstantiation(UnsupportedClassTestOptions.class, Float.class.getName(),
+//                "Expected exception not thrown for unsupported options class", "Class");
+//    }
+
     @Test
     public void unsupportedOptionClassShouldThrowAnException() throws InstantiationException {
-        testOptionsInstantiation(UnsupportedClassTestOptions.class, Float.class.getName(),
+        testOptionsInstantiation(UnsupportedClassTestOptions.class, MyInt.class.getName(),
                 "Expected exception not thrown for unsupported options class", "Class");
     }
 
+//    @Test
+//    public void missingSetterShouldThrowAnException() throws InstantiationException, NoSuchMethodException {
+//        testForInstantiationException(MissingSetterTestOptions.class, "getInt",
+//                "Expected exception not thrown for missing setter method");
+//    }
+
     @Test
-    public void missingSetterShouldThrowAnException() throws InstantiationException, NoSuchMethodException {
-        testForInstantiationException(MissingSetterTestOptions.class, "getInt",
-                "Expected exception not thrown for missing setter method");
+    public void missingSetterShouldSetReadOnlyTrue() throws InstantiationException, NoSuchMethodException {
+        try {
+            AbstractOption option = getSingleOptionInstance(MissingSetterTestOptions.class);
+            assertTrue("Missing setter should set readOnly value to true", option.isReadOnly());
+        }
+        catch (Exception e){
+            fail("Missing setter test fail");
+        }
     }
 
     @Test
