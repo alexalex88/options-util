@@ -31,6 +31,7 @@ public class AbstractOptionTest {
     private AbstractOption integerOption;
     private AbstractOption booleanOption;
     private AbstractOption stringOption;
+    private AbstractOption arbitraryOption;
 
     @BeforeClass
     public static void setUpClass() {
@@ -43,6 +44,7 @@ public class AbstractOptionTest {
         integerOption = AbstractOption.getOptionForClass(Integer.class);
         booleanOption = AbstractOption.getOptionForClass(Boolean.class);
         stringOption = AbstractOption.getOptionForClass(String.class);
+        arbitraryOption = AbstractOption.getOptionForClass(Double.class);
     }
 
     @Test
@@ -50,6 +52,7 @@ public class AbstractOptionTest {
         assertTrue("Option for class Integer should be instantiated as IntegerOption", integerOption instanceof IntegerOption);
         assertTrue("Option for class Boolean should be instantiated as BooleanOption", booleanOption instanceof BooleanOption);
         assertTrue("Option for class String should be instantiated as StringOption", stringOption instanceof StringOption);
+        assertTrue("Option for class String should be instantiated as StringOption", arbitraryOption instanceof ArbitraryOption);
     }
 
     @Test
@@ -60,6 +63,8 @@ public class AbstractOptionTest {
         assertEquals("Assigning String value to StringOption should return correct String value", "abc", stringOption.getValue());
         booleanOption.setStringValue("true");
         assertEquals("Assigning String value to BooleanOption should return correct Boolean value", true, booleanOption.getValue());
+        arbitraryOption.setStringValue("1.0f");
+        assertTrue("Assigning String value to ArbitraryOption should return correct Double value", Double.compare(1.0f, (double)arbitraryOption.getValue()) == 0);
     }
 
     @Test
@@ -71,8 +76,11 @@ public class AbstractOptionTest {
         assertEquals("Assigning boolean value to BooleanOption should return correct String representation", "true",
                 booleanOption.getStringValue());
         stringOption.setValue("abc");
-        assertEquals("Assigning string value to StringOption should return currect String representation", "abc",
+        assertEquals("Assigning string value to StringOption should return correct String representation", "abc",
                 stringOption.getStringValue());
+        arbitraryOption.setValue(1.0d);
+        assertEquals("Assigning string value to ArbitraryOption should return correct String representation", "1.0",
+                arbitraryOption.getStringValue());
     }
 
     @Test
@@ -81,6 +89,10 @@ public class AbstractOptionTest {
         assertTrue(integerOption.tryStringToValueConversion());
         integerOption.setStringValue("aaa");
         assertFalse(integerOption.tryStringToValueConversion());
+        arbitraryOption.setStringValue("1");
+        assertTrue(arbitraryOption.tryStringToValueConversion());
+        arbitraryOption.setStringValue("aaa");
+        assertFalse(arbitraryOption.tryStringToValueConversion());
     }
 
     @Test

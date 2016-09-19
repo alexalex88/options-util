@@ -20,9 +20,9 @@ import org.plukh.options.ParseException;
 import org.plukh.options.UnsupportedOptionClassException;
 import org.plukh.options.impl.collections.CollectionBackedOption;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * Abstract superclass for all other options classes. Option classes for specific option types must extend this
@@ -37,6 +37,7 @@ public abstract class AbstractOption {
     protected static final Map<Class, Class<? extends AbstractOption>> OPTION_CLASSES = new HashMap<Class, Class<? extends AbstractOption>>();
     protected static final Map<Class<? extends Collection>, Class<? extends CollectionBackedOption>> COLLECTION_CLASSES = new HashMap
             <Class<? extends Collection>, Class<? extends CollectionBackedOption>>();
+    protected static final Set<Class> VALIDATED_ARBITRARY_CLASSES = new HashSet<>();
 
     protected String key;
     protected String stringValue;
@@ -249,9 +250,23 @@ public abstract class AbstractOption {
      */
     public static AbstractOption getOptionForClass(Class clazz) throws UnsupportedOptionClassException, IllegalAccessException, InstantiationException {
         Class<? extends AbstractOption> optionClass = OPTION_CLASSES.get(clazz);
+        if (optionClass != null) return optionClass.newInstance();
+
+        if (!VALIDATED_ARBITRARY_CLASSES.contains(clazz)) registerArbitraryOptionClass(clazz);
+
+        if (VALIDATED_ARBITRARY_CLASSES.contains(clazz)) optionClass = ArbitraryOption.class;
+
         if (optionClass == null) throw new UnsupportedOptionClassException("There is no supported option class for " +
                 clazz.getName());
-        return optionClass.newInstance();
+
+        try {
+            Constructor<?> ctor = ArbitraryOption.class.getConstructor(Class.class);
+            return (ArbitraryOption)ctor.newInstance(new Object[]{clazz});
+        }
+        catch (Exception e) {
+            throw new InstantiationException("Failed to instantiate class " +
+                    clazz.getName());
+        }
     }
 
     public static CollectionOption getCollectionOption(Class elementClass, Class collectionClass) throws UnsupportedOptionClassException {
@@ -269,6 +284,25 @@ public abstract class AbstractOption {
             throw new UnsupportedOptionClassException("There is no supported options collection class for " +
                     collectionClass.getName());
         return new CollectionOption(collectionClass, elementClass, optionCollectionClass, backingClass);
+    }
+
+    protected static boolean isValidArbitraryOptionClass(Class clazz) {
+        try {
+            Constructor<?> ctor = clazz.getConstructor(String.class);
+            Method m = clazz.getMethod("toString");
+            if (m.getParameterCount() != 0) return false;
+        }
+        catch (NoSuchMethodException e) {
+            return false;
+        }
+        return true;
+    }
+
+
+    public static void registerArbitraryOptionClass(Class clazz) {
+        if (isValidArbitraryOptionClass(clazz)) {
+            VALIDATED_ARBITRARY_CLASSES.add(clazz);
+        }
     }
 
     /**
